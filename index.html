@@ -438,9 +438,28 @@ async function submitToSupabase(){
       damage_description: damageDesc || null,
       agreed_to_terms: true,
       photo_urls: photoUrls
-    });
+    }).select().single();
 
     if(insertRes.error) throw new Error('Database insert failed: '+insertRes.error.message);
+
+    // Notify via Edge Function directly (no DB webhook needed)
+    document.getElementById('loadingMsg').textContent = 'Sending notification...';
+    try{
+      var notifyRes = await fetch(SUPABASE_URL + '/functions/v1/notify-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ record: insertRes.data })
+      });
+      if(!notifyRes.ok){
+        console.error('Notify function failed:', await notifyRes.text());
+        // Don't block the success screen on email failure — submission itself succeeded
+      }
+    } catch(notifyErr){
+      console.error('Notify call error:', notifyErr);
+    }
 
     var b=boat==='monark'?'Monark':'Tracker', t=ftype==='pickup'?'pick up':'drop off';
     document.getElementById('okMsg').textContent='Your '+b+' '+t+' form has been submitted. Photos are recorded as documentation of the vessel condition.';
