@@ -297,6 +297,7 @@ function cfg(){
     p.push({k:'passenger',l:'Passenger Side',h:'Full-length photo of the starboard/passenger side.',min:1,ex:null});
     p.push({k:'troll',l:'Trolling Motor',h:'Photo showing the full trolling motor \u2014 head, shaft, and prop.',min:1,ex:null});
     p.push({k:'latch',l:'Motor Lock Latch',h:'Confirm the motor lock latch is engaged. Latch clearly visible.',min:1,ex:tr?'tracker_latch':'monark_latch'});
+    p.push({k:'keys',l:'Keys',h:'Photo of the keys.',min:1,ex:null});
   } else {
     var lx=tr?'tracker_latch':'monark_latch';
     p.push({k:'runswitch',l:'Red Run Switch \u2014 Off',h:'Photo confirming the red run switch is in the off position.',min:1,ex:null});
@@ -308,6 +309,7 @@ function cfg(){
     p.push({k:'troll',l:'Trolling Motor',h:'Photo of the full trolling motor unit.',min:1,ex:null});
     p.push({k:'latch',l:'Motor Lock Latch',h:'Confirm the motor lock latch is engaged before leaving.',min:1,ex:lx});
     p.push({k:'gasreceipt',l:'Gas Receipt',h:'Photo or scan of your gas receipt.',min:1,ex:null});
+    p.push({k:'keys',l:'Keys',h:'Photo of the keys being returned.',min:1,ex:null});
     p.push({k:'damagephotos',l:'Damage Photos (if any)',h:'Upload photos of any damage. Leave empty if none.',min:0,ex:null,opt:true});
   }
   return p;
