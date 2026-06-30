@@ -222,7 +222,7 @@ function buildForm(){
   photos.forEach(function(p){f.innerHTML+=mkPhoto(p);});
   if(pu){
     f.innerHTML+='<div class="sl">Identification</div>';
-    f.innerHTML+=mkPhoto({k:'license',l:"Driver's License & Boating License",h:'Upload photos or scans of both licenses.',min:1,ex:null});
+    f.innerHTML+=mkPhoto({k:'license',l:"Driver's License & Boating License",h:'Upload one photo of each: your driver\'s license and your boating license.',min:2,ex:null});
   }
   if(!pu) f.innerHTML+=mkText('damageDesc','Damage Description (if any)','textarea','Describe any damage. Leave blank if none.',true);
   f.innerHTML+='<div class="sl">Liability &amp; Rental Agreement</div>';
@@ -239,7 +239,7 @@ function buildForm(){
     var inp=document.getElementById('f-'+p.k);
     if(inp) inp.addEventListener('change',function(){handleF(p.k,p.min||0,this);});
   });
-  if(pu){var li=document.getElementById('f-license'); if(li) li.addEventListener('change',function(){handleF('license',1,this);});}
+  if(pu){var li=document.getElementById('f-license'); if(li) li.addEventListener('change',function(){handleF('license',2,this);});}
   f.querySelectorAll('.zone').forEach(function(z){
     z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('ov');});
     z.addEventListener('dragleave',function(){z.classList.remove('ov');});
@@ -408,7 +408,7 @@ function handleSub(e){
   var em=document.getElementById('email'); chk('email',em&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim()));
   var dt=document.getElementById('rentalDate'); chk('rentalDate',dt&&dt.value.length>0);
   cfg().forEach(function(p){if(p.opt) return; chk(p.k,(store[p.k]||[]).length>=(p.min||1));});
-  if(ftype==='pickup') chk('license',(store['license']||[]).length>=1);
+  if(ftype==='pickup') chk('license',(store['license']||[]).length>=2);
   chk('agree',document.getElementById('agreeCheck').checked);
   if(!valid){var first=document.querySelector('.card.bad');if(first) first.scrollIntoView({behavior:'smooth',block:'center'});return;}
 
