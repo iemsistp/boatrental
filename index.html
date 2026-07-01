@@ -292,6 +292,29 @@ textarea{resize:vertical;min-height:76px}
       <textarea id="bkNotes" placeholder="Anything we should know..." style="min-height:80px;resize:vertical"></textarea>
     </div>
 
+    <div class="sl">Terms &amp; Conditions</div>
+    <div class="bk-card">
+      <div class="tbox"><h3>Terms &amp; Conditions</h3><ol>
+        <li>Minimum age of renter is 21 years of age.</li>
+        <li>A valid driver&#39;s license or passport must be presented at time of reservation and rental.</li>
+        <li>A valid boater&#39;s license must be presented at time of reservation and rental.</li>
+        <li>The renter is responsible for all damage or theft to the rented boat, PWC, trailer, or equipment however caused.</li>
+        <li>The renter acknowledges a $300 damage deposit and liability of up to $2,000 for major damages.</li>
+        <li>The renter will secure the boat or trailer if renting more than one day to prevent theft or damage.</li>
+        <li>The boat will not be operated more than 300 km from the rental location.</li>
+        <li>In the event of a non-fault mechanical breakdown, an alternate boat will be provided if possible. If not, a partial refund may be issued at discretion.</li>
+        <li>Each renter, passenger, and parent (if child under 18) must sign the liability waiver prior to renting.</li>
+        <li>The boat will be inspected at the start and end of each rental.</li>
+        <li>A lifejacket or approved flotation device must be available for each person on board.</li>
+        <li>Mandatory safety equipment must not be removed from the vessel.</li>
+        <li>The operator must carry a Pleasure Craft Operator Card or rental agreement copy and produce it if requested by police.</li>
+      </ol></div>
+      <label class="cr" style="margin-top:4px"><input type="checkbox" id="bkAgreeCheck">
+        <span>I have read and agree to the above terms. I will operate the vessel with care. I acknowledge that damages will be deducted from the security deposit.</span>
+      </label>
+      <div class="bk-err" id="bkAgreeErr" style="margin-top:8px">You must agree to the terms to continue.</div>
+    </div>
+
     <button class="subbtn" onclick="goToBkReview()">Review Booking &#8594;</button>
     <button class="bk-back" onclick="showBkStep(2)">&#8592; Back</button>
   </div>
@@ -1107,7 +1130,9 @@ function goToBkReview() {
   document.getElementById('bkPhoneErr').style.display = phone?'none':'block';
   document.getElementById('bkDlErr').style.display    = bookDlFiles.length?'none':'block';
   document.getElementById('bkBlErr').style.display    = bookBlFiles.length?'none':'block';
-  if (!name||!emailOk||!phone||!bookDlFiles.length||!bookBlFiles.length) return;
+  var agreed = document.getElementById('bkAgreeCheck').checked;
+  document.getElementById('bkAgreeErr').style.display = agreed?'none':'block';
+  if (!name||!emailOk||!phone||!bookDlFiles.length||!bookBlFiles.length||!agreed) return;
 
   var puDT  = bkDT(bookPickupDate,  bookPickupHour);
   var doDT  = bkDT(bookDropoffDate, bookDropoffHour);
