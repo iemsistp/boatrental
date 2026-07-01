@@ -33,8 +33,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .go{width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;opacity:.35;pointer-events:none}
 .go.rdy{opacity:1;pointer-events:auto}
 .go.rdy:hover{background:#153d2f;transform:translateY(-1px);box-shadow:0 6px 24px rgba(26,76,59,.3)}
-.intent{opacity:.4;pointer-events:none;transition:opacity .2s}
-.intent.enabled{opacity:1;pointer-events:auto}
+/* .intent disabled state removed — intent screen is now a separate page */
 .fw{max-width:660px;margin:0 auto;padding:32px 18px 0;display:none}
 .sl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:36px;display:flex;align-items:center;gap:12px}
 .sl::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -137,32 +136,38 @@ textarea{resize:vertical;min-height:76px}
   </div>
 </div>
 
+<!-- ── PAGE 1: Choose your boat ── -->
 <div class="sel" id="selScreen">
-  <h2>Monark Boat Rentals</h2>
-  <p>Select your boat to get started.</p>
+  <h2>Choose Your Boat</h2>
+  <p>Select the boat you're here for.</p>
 
-  <div class="sg">Which boat?</div>
   <div class="sgr">
-    <div class="sc" id="sbM" onclick="pickBoatHome('monark')"><span class="si">&#128758;</span><div class="st">Monark</div><div class="ss">Fishing boat</div></div>
-    <div class="sc" id="sbT" onclick="pickBoatHome('tracker')"><span class="si">&#128676;</span><div class="st">Tracker</div><div class="ss">Bass boat</div></div>
+    <div class="sc" id="sbM" onclick="pickBoatHome('monark')"><span class="si" style="filter:sepia(1) hue-rotate(185deg) saturate(4) brightness(0.8);">&#128676;</span><div class="st">Monark</div><div class="ss">Fishing boat</div></div>
+    <div class="sc" id="sbT" onclick="pickBoatHome('tracker')"><span class="si" style="filter:saturate(0) brightness(0.75);">&#128676;</span><div class="st">Tracker</div><div class="ss">Bass boat</div></div>
   </div>
-  <div style="display:flex;gap:10px;justify-content:center;margin:-8px 0 24px">
+  <div style="display:flex;gap:10px;justify-content:center;margin:4px 0 0">
     <a href="monark-guide.html" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Monark guide</a>
     <span style="color:var(--border);">|</span>
     <a href="tracker-guide.html" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Tracker guide</a>
   </div>
+</div>
 
-  <div class="sg">What do you need to do?</div>
+<!-- ── PAGE 2: What do you need to do? ── -->
+<div class="sel" id="intentScreen" style="display:none">
+  <h2 id="intentTitle">What do you need to do?</h2>
+  <p id="intentSub">Choose an option below to continue.</p>
+
   <div class="sgr" style="grid-template-columns:1fr;margin-bottom:12px">
-    <div class="sc intent" id="optBook" onclick="chooseIntent('book')" style="display:flex;align-items:center;gap:14px;text-align:left;padding:16px 20px">
+    <div class="sc" id="optBook" onclick="chooseIntent('book')" style="display:flex;align-items:center;gap:14px;text-align:left;padding:16px 20px">
       <span class="si" style="font-size:28px;margin:0;flex-shrink:0">&#128197;</span>
       <div><div class="st">Book a Boat</div><div class="ss">Check availability and reserve your rental</div></div>
     </div>
   </div>
   <div class="sgr">
-    <div class="sc intent" id="optPickup" onclick="chooseIntent('pickup')"><span class="si">&#128273;</span><div class="st">Pick Up</div><div class="ss">Before departure</div></div>
-    <div class="sc intent" id="optDropoff" onclick="chooseIntent('dropoff')"><span class="si">&#127937;</span><div class="st">Drop Off</div><div class="ss">After return</div></div>
+    <div class="sc" id="optPickup" onclick="chooseIntent('pickup')"><span class="si">&#128273;</span><div class="st">Pick Up</div><div class="ss">Before departure</div></div>
+    <div class="sc" id="optDropoff" onclick="chooseIntent('dropoff')"><span class="si">&#127937;</span><div class="st">Drop Off</div><div class="ss">After return</div></div>
   </div>
+  <button class="bk-back" style="margin-top:8px" onclick="goBackToBoatSelect()">&#8592; Change boat</button>
 </div>
 
 <div class="fw" id="guideScreen" style="display:none;max-width:660px;margin:0 auto;padding:28px 18px 0;"></div>
@@ -353,11 +358,25 @@ function pickBoatHome(val){
   boat=val;
   document.getElementById('sbM').classList.toggle('on',val==='monark');
   document.getElementById('sbT').classList.toggle('on',val==='tracker');
-  ['optBook','optPickup','optDropoff'].forEach(function(id){
-    document.getElementById(id).classList.add('enabled');
-  });
   // Pre-fetch availability now so calendar is ready when they open booking
   prefetchBusy(val);
+  // Move to intent screen
+  var label = val==='monark' ? 'Monark' : 'Tracker';
+  document.getElementById('intentTitle').textContent = 'What do you need to do?';
+  document.getElementById('intentSub').textContent = label + ' — choose an option below.';
+  document.getElementById('hTitle').textContent = label;
+  document.getElementById('hSub').textContent = 'What brings you in today?';
+  document.getElementById('selScreen').style.display = 'none';
+  document.getElementById('intentScreen').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBackToBoatSelect(){
+  document.getElementById('intentScreen').style.display = 'none';
+  document.getElementById('selScreen').style.display = 'block';
+  document.getElementById('hTitle').textContent = 'Monark Boat Rentals';
+  document.getElementById('hSub').textContent = 'Book a rental or complete pickup / drop-off documentation.';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // Cache keyed by boat so switching boats re-fetches correctly
@@ -425,6 +444,7 @@ function hideBkCalLoading() {
 
 function chooseIntent(kind){
   if(!boat) return;
+  document.getElementById('intentScreen').style.display='none';
   if(kind==='book'){
     startBooking();
   } else {
@@ -436,6 +456,7 @@ function chooseIntent(kind){
 function startForm(){
   if(!boat||!ftype) return;
   document.getElementById('selScreen').style.display='none';
+  document.getElementById('intentScreen').style.display='none';
   var guideUrl=(boat==='monark'?'monark-guide.html':'tracker-guide.html');
   var gLink=document.getElementById('guideLink');
   gLink.href=guideUrl; gLink.style.display='inline-block';
@@ -864,6 +885,7 @@ var BK_DOWS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 // ── Start / Cancel ────────────────────────────────────────────
 function startBooking() {
   document.getElementById('selScreen').style.display = 'none';
+  document.getElementById('intentScreen').style.display = 'none';
   document.getElementById('bkSection').style.display = 'block';
   document.getElementById('pBar').style.width = '0%';
   document.getElementById('pLabel').style.visibility = 'visible';
@@ -1156,11 +1178,12 @@ function backToHome(){
   document.getElementById('guideScreen').style.display='none';
   document.getElementById('formWrap').style.display='none';
   document.getElementById('bkSection').style.display='none';
+  document.getElementById('intentScreen').style.display='none';
   document.getElementById('selScreen').style.display='block';
   document.getElementById('pBar').style.width='0%';
   document.getElementById('pLabel').style.visibility='hidden';
   document.getElementById('hTitle').textContent='Monark Boat Rentals';
-  document.getElementById('hSub').textContent='Select your boat to get started.';
+  document.getElementById('hSub').textContent='Book a rental or complete pickup / drop-off documentation.';
   document.getElementById('guideLink').style.display='none';
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1168,15 +1191,15 @@ function backToHome(){
 function resetApp(){
   boat=null;ftype=null;store={};
   ['sbM','sbT'].forEach(function(id){document.getElementById(id).classList.remove('on');});
-  ['optBook','optPickup','optDropoff'].forEach(function(id){document.getElementById(id).classList.remove('enabled');});
   document.getElementById('okScreen').classList.remove('on');
   document.getElementById('errorScreen').classList.remove('on');
   document.getElementById('formWrap').style.display='none';
   document.getElementById('guideScreen').style.display='none';
+  document.getElementById('intentScreen').style.display='none';
   document.getElementById('selScreen').style.display='block';
   document.getElementById('bkSection').style.display='none';
   document.getElementById('hTitle').textContent='Monark Boat Rentals';
-  document.getElementById('hSub').textContent='Select your boat to get started.';
+  document.getElementById('hSub').textContent='Book a rental or complete pickup / drop-off documentation.';
   document.getElementById('pBar').style.width='0%';
   document.getElementById('pLabel').style.visibility='hidden';
   document.getElementById('guideLink').style.display='none';
