@@ -33,6 +33,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .go{width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;opacity:.35;pointer-events:none}
 .go.rdy{opacity:1;pointer-events:auto}
 .go.rdy:hover{background:#153d2f;transform:translateY(-1px);box-shadow:0 6px 24px rgba(26,76,59,.3)}
+.intent{opacity:.4;pointer-events:none;transition:opacity .2s}
+.intent.enabled{opacity:1;pointer-events:auto}
 .fw{max-width:660px;margin:0 auto;padding:32px 18px 0;display:none}
 .sl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:36px;display:flex;align-items:center;gap:12px}
 .sl::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -84,14 +86,51 @@ textarea{resize:vertical;min-height:76px}
 .ok p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px}
 .rbtn{padding:11px 26px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
 @media(max-width:480px){.sgr{grid-template-columns:1fr}.hdr{padding:32px 18px 28px}.card{padding:16px}}
+/* ── BOOKING CALENDAR STYLES ── */
+.bk-section{max-width:640px;margin:0 auto;padding:28px 18px 0}
+.bk-step{display:none}
+.bk-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.bk-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.bk-cal-month{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400}
+.bk-cal-btn{background:none;border:1.5px solid var(--border);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.bk-cal-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bk-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.bk-cal-dow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--muted);text-align:center;padding:4px 0 8px;text-transform:uppercase}
+.bk-cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;cursor:pointer;transition:all .15s}
+.bk-cal-day:hover:not(.empty):not(.past){background:var(--accent-light)}
+.bk-cal-day.empty{cursor:default}
+.bk-cal-day.past{color:#ccc;cursor:not-allowed}
+.bk-cal-day.full{background:#fdf0ee;color:#c0392b}
+.bk-cal-day.partial{background:#fdf6e3;color:#b8860b}
+.bk-cal-day.selected{background:var(--accent)!important;color:#fff!important;font-weight:600}
+.bk-cal-day.today{font-weight:700}
+.bk-time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.bk-time-slot{padding:8px 4px;text-align:center;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s}
+.bk-time-slot:hover:not(.busy){border-color:var(--accent);color:var(--accent)}
+.bk-time-slot.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bk-time-slot.busy{background:#fdf0ee;color:#c0392b;border-color:#f5cbc7;cursor:not-allowed}
+.bk-dt-box{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:none}
+.bk-dt-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.bk-dt-value{font-size:15px;font-weight:600}
+.bk-rv-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+.bk-rv-row:last-child{border-bottom:none}
+.bk-rv-label{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.05em;padding-top:2px}
+.bk-rv-value{font-size:14px;font-weight:500;text-align:right;max-width:60%}
+.bk-back{width:100%;padding:14px;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;transition:all .2s}
+.bk-back:hover{background:var(--accent-light)}
+.bk-err{font-size:12px;color:var(--warn);margin-top:5px;display:none}
+.bk-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.bk-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.bk-legend-dot{width:10px;height:10px;border-radius:50%}
+@media(max-width:480px){.bk-time-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 <div class="hdr">
   <div class="hi">
     <div class="ey">Monark Boat Rentals</div>
-    <h1 id="hTitle">Rental Documentation</h1>
-    <p id="hSub">Select your boat and form type to get started.</p>
+    <h1 id="hTitle">Monark Boat Rentals</h1>
+    <p id="hSub">Book a rental or complete pickup / drop-off documentation.</p>
     <div class="pw"><div class="pb" id="pBar"></div></div>
     <div class="pl" id="pLabel" style="visibility:hidden">0 of 0 complete</div>
     <a href="#" id="guideLink" style="display:none;margin-top:14px;font-size:12px;color:#fff;opacity:.85;text-decoration:underline;font-family:'DM Mono',monospace;letter-spacing:.05em;">&#128214; View boat guide</a>
@@ -99,32 +138,181 @@ textarea{resize:vertical;min-height:76px}
 </div>
 
 <div class="sel" id="selScreen">
-  <h2>Which boat are you renting?</h2>
-  <p>Select your boat and whether you are picking up or dropping off.</p>
-  <div class="sg">Boat</div>
+  <h2>Monark Boat Rentals</h2>
+  <p>Select your boat to get started.</p>
+
+  <div class="sg">Which boat?</div>
   <div class="sgr">
-    <div class="sc" id="sbM"><span class="si">&#128758;</span><div class="st">Monark</div><div class="ss">Fishing boat</div></div>
-    <div class="sc" id="sbT"><span class="si">&#128676;</span><div class="st">Tracker</div><div class="ss">Bass boat</div></div>
+    <div class="sc" id="sbM" onclick="pickBoatHome('monark')"><span class="si">&#128758;</span><div class="st">Monark</div><div class="ss">Fishing boat</div></div>
+    <div class="sc" id="sbT" onclick="pickBoatHome('tracker')"><span class="si">&#128676;</span><div class="st">Tracker</div><div class="ss">Bass boat</div></div>
   </div>
-  <div class="sg">Form Type</div>
-  <div class="sgr">
-    <div class="sc" id="sbP"><span class="si">&#128273;</span><div class="st">Pick Up</div><div class="ss">Before departure</div></div>
-    <div class="sc" id="sbD"><span class="si">&#127937;</span><div class="st">Drop Off</div><div class="ss">After return</div></div>
+  <div style="display:flex;gap:10px;justify-content:center;margin:-8px 0 24px">
+    <a href="monark-guide.html" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Monark guide</a>
+    <span style="color:var(--border);">|</span>
+    <a href="tracker-guide.html" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Tracker guide</a>
   </div>
-  <button class="go" id="goBtn">Continue &#8594;</button>
-  <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);text-align:center;">
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Need a refresher on operating the boat?</p>
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <a href="monark-guide.html" style="font-size:13px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Monark guide</a>
-      <span style="color:var(--border);">|</span>
-      <a href="tracker-guide.html" style="font-size:13px;color:var(--accent);text-decoration:none;font-weight:600;">&#128214; Tracker guide</a>
+
+  <div class="sg">What do you need to do?</div>
+  <div class="sgr" style="grid-template-columns:1fr;margin-bottom:12px">
+    <div class="sc intent" id="optBook" onclick="chooseIntent('book')" style="display:flex;align-items:center;gap:14px;text-align:left;padding:16px 20px">
+      <span class="si" style="font-size:28px;margin:0;flex-shrink:0">&#128197;</span>
+      <div><div class="st">Book a Boat</div><div class="ss">Check availability and reserve your rental</div></div>
     </div>
+  </div>
+  <div class="sgr">
+    <div class="sc intent" id="optPickup" onclick="chooseIntent('pickup')"><span class="si">&#128273;</span><div class="st">Pick Up</div><div class="ss">Before departure</div></div>
+    <div class="sc intent" id="optDropoff" onclick="chooseIntent('dropoff')"><span class="si">&#127937;</span><div class="st">Drop Off</div><div class="ss">After return</div></div>
   </div>
 </div>
 
 <div class="fw" id="guideScreen" style="display:none;max-width:660px;margin:0 auto;padding:28px 18px 0;"></div>
 
 <div class="fw" id="formWrap"><form id="theForm"></form></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BOOKING SECTION — calendar, dates, details, review
+     ═══════════════════════════════════════════════════════ -->
+<div class="bk-section" id="bkSection" style="display:none">
+
+  <!-- Step 1: Pickup -->
+  <div class="bk-step" id="bkStep1">
+    <div class="sl">Pick up &#8212; choose date</div>
+    <div class="bk-card">
+      <div class="bk-cal-nav">
+        <button class="bk-cal-btn" onclick="changeMonthBk(1,-1)">&#8249;</button>
+        <span class="bk-cal-month" id="bkCalLabel1"></span>
+        <button class="bk-cal-btn" onclick="changeMonthBk(1,1)">&#8250;</button>
+      </div>
+      <div id="bkCalGrid1" class="bk-cal-grid"></div>
+      <div class="bk-legend">
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:var(--accent)"></div>Selected</div>
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:#b8860b"></div>Partially booked</div>
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:#c0392b"></div>Fully booked</div>
+      </div>
+    </div>
+    <div id="bkTimeSection1" style="display:none">
+      <div class="sl">Pick up &#8212; choose time</div>
+      <div class="bk-card">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:0">Date: <strong id="bkPuDateLabel"></strong></p>
+        <div id="bkTimeGrid1" class="bk-time-grid"></div>
+      </div>
+    </div>
+    <div class="bk-dt-box" id="bkPuBox">
+      <div class="bk-dt-label">&#128197; Pickup</div>
+      <div class="bk-dt-value" id="bkPuDisplay"></div>
+    </div>
+    <button class="go" id="bkStep1Next" onclick="showBkStep(2)">Set Drop-off &#8594;</button>
+    <button class="bk-back" onclick="cancelBooking()">&#8592; Back to main</button>
+  </div>
+
+  <!-- Step 2: Dropoff -->
+  <div class="bk-step" id="bkStep2">
+    <div class="sl">Drop off &#8212; choose date</div>
+    <div class="bk-card">
+      <div class="bk-cal-nav">
+        <button class="bk-cal-btn" onclick="changeMonthBk(2,-1)">&#8249;</button>
+        <span class="bk-cal-month" id="bkCalLabel2"></span>
+        <button class="bk-cal-btn" onclick="changeMonthBk(2,1)">&#8250;</button>
+      </div>
+      <div id="bkCalGrid2" class="bk-cal-grid"></div>
+      <div class="bk-legend">
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:var(--accent)"></div>Selected</div>
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:#b8860b"></div>Partially booked</div>
+        <div class="bk-legend-item"><div class="bk-legend-dot" style="background:#c0392b"></div>Fully booked</div>
+      </div>
+    </div>
+    <div id="bkTimeSection2" style="display:none">
+      <div class="sl">Drop off &#8212; choose time</div>
+      <div class="bk-card">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:0">Date: <strong id="bkDoDateLabel"></strong></p>
+        <div id="bkTimeGrid2" class="bk-time-grid"></div>
+      </div>
+    </div>
+    <div class="bk-dt-box" id="bkDoBox">
+      <div class="bk-dt-label">&#127937; Drop-off</div>
+      <div class="bk-dt-value" id="bkDoDisplay"></div>
+    </div>
+    <div class="bk-err" id="bkDateErr">Drop-off must be after pickup.</div>
+    <button class="go" id="bkStep2Next" onclick="showBkStep(3)">Your Details &#8594;</button>
+    <button class="bk-back" onclick="showBkStep(1)">&#8592; Back</button>
+  </div>
+
+  <!-- Step 3: Details + Licences -->
+  <div class="bk-step" id="bkStep3">
+    <div class="sl">Your information</div>
+    <div class="bk-card">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Full Name <span style="color:var(--warn)">*</span></label>
+        <input type="text" id="bkName" placeholder="First and last name" autocomplete="name">
+        <div class="bk-err" id="bkNameErr">Please enter your full name.</div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email Address <span style="color:var(--warn)">*</span></label>
+        <input type="email" id="bkEmail" placeholder="you@email.com" autocomplete="email">
+        <div class="bk-err" id="bkEmailErr">Please enter a valid email address.</div>
+      </div>
+      <div>
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Phone Number <span style="color:var(--warn)">*</span></label>
+        <input type="tel" id="bkPhone" placeholder="(xxx) xxx-xxxx" autocomplete="tel">
+        <div class="bk-err" id="bkPhoneErr">Please enter your phone number.</div>
+      </div>
+    </div>
+
+    <div class="sl">Driver&#39;s License</div>
+    <div class="bk-card">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Upload a clear photo of your driver&#39;s license (front).</p>
+      <div class="zone" id="bkDlZone" onclick="document.getElementById('bkDlInput').click()">
+        <input type="file" id="bkDlInput" accept="image/*,.pdf" style="display:none">
+        <span class="zi">&#128443;</span>
+        <p><strong>Tap to upload</strong> driver&#39;s license<br><span style="font-size:11px">Photo or PDF</span></p>
+      </div>
+      <div class="prevs" id="bkDlPrev"></div>
+      <div class="bk-err" id="bkDlErr">Please upload your driver&#39;s license.</div>
+    </div>
+
+    <div class="sl">Boating License</div>
+    <div class="bk-card">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Upload your Pleasure Craft Operator Card.</p>
+      <div class="zone" id="bkBlZone" onclick="document.getElementById('bkBlInput').click()">
+        <input type="file" id="bkBlInput" accept="image/*,.pdf" style="display:none">
+        <span class="zi">&#9973;</span>
+        <p><strong>Tap to upload</strong> boating license<br><span style="font-size:11px">Photo or PDF</span></p>
+      </div>
+      <div class="prevs" id="bkBlPrev"></div>
+      <div class="bk-err" id="bkBlErr">Please upload your boating license.</div>
+    </div>
+
+    <div style="margin:4px 0 16px">
+      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Notes <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+      <textarea id="bkNotes" placeholder="Anything we should know..." style="min-height:80px;resize:vertical"></textarea>
+    </div>
+
+    <button class="subbtn" onclick="goToBkReview()">Review Booking &#8594;</button>
+    <button class="bk-back" onclick="showBkStep(2)">&#8592; Back</button>
+  </div>
+
+  <!-- Step 4: Review -->
+  <div class="bk-step" id="bkStep4">
+    <div class="sl">Review your booking</div>
+    <div class="bk-card">
+      <div class="bk-rv-row"><span class="bk-rv-label">Boat</span><span class="bk-rv-value" id="rvBkBoat"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Pickup</span><span class="bk-rv-value" id="rvBkPickup"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Drop-off</span><span class="bk-rv-value" id="rvBkDropoff"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Duration</span><span class="bk-rv-value" id="rvBkDuration"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Name</span><span class="bk-rv-value" id="rvBkName"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Email</span><span class="bk-rv-value" id="rvBkEmail"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Phone</span><span class="bk-rv-value" id="rvBkPhone"></span></div>
+      <div class="bk-rv-row"><span class="bk-rv-label">Docs</span><span class="bk-rv-value">&#10003; Driver&#39;s &amp; boating license</span></div>
+    </div>
+    <div style="background:#fdf0ee;border:1.5px solid #f5cbc7;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+      <p style="font-size:13px;color:#8a2e22;line-height:1.55;margin:0">Your booking request will be reviewed and you&#39;ll receive a confirmation email. <strong>The boat is not reserved until you receive approval.</strong></p>
+    </div>
+    <button class="subbtn" onclick="submitBkBooking()">Submit Booking Request &#8594;</button>
+    <button class="bk-back" onclick="showBkStep(3)">&#8592; Back</button>
+  </div>
+
+</div>
+<!-- END BOOKING SECTION -->
 
 <div class="ok" id="okScreen">
   <div class="oki">&#10003;</div>
@@ -159,25 +347,25 @@ const EXAMPLE_PHOTOS = {
 
 var boat=null,ftype=null,store={};
 
-document.getElementById('sbM').addEventListener('click',function(){pick('boat','monark');});
-document.getElementById('sbT').addEventListener('click',function(){pick('boat','tracker');});
-document.getElementById('sbP').addEventListener('click',function(){pick('type','pickup');});
-document.getElementById('sbD').addEventListener('click',function(){pick('type','dropoff');});
-document.getElementById('goBtn').addEventListener('click',startForm);
 document.getElementById('resetBtn').addEventListener('click',resetApp);
 
-function pick(kind,val){
-  if(kind==='boat'){
-    boat=val;
-    document.getElementById('sbM').classList.toggle('on',val==='monark');
-    document.getElementById('sbT').classList.toggle('on',val==='tracker');
+function pickBoatHome(val){
+  boat=val;
+  document.getElementById('sbM').classList.toggle('on',val==='monark');
+  document.getElementById('sbT').classList.toggle('on',val==='tracker');
+  ['optBook','optPickup','optDropoff'].forEach(function(id){
+    document.getElementById(id).classList.add('enabled');
+  });
+}
+
+function chooseIntent(kind){
+  if(!boat) return;
+  if(kind==='book'){
+    startBooking();
   } else {
-    ftype=val;
-    document.getElementById('sbP').classList.toggle('on',val==='pickup');
-    document.getElementById('sbD').classList.toggle('on',val==='dropoff');
+    ftype=kind;
+    startForm();
   }
-  var b=document.getElementById('goBtn');
-  if(boat&&ftype) b.classList.add('rdy'); else b.classList.remove('rdy');
 }
 
 function startForm(){
@@ -258,10 +446,12 @@ function buildGuideScreen(){
   ]);
 
   html+='<button type="button" class="go rdy" id="guideContinueBtn" style="margin-top:24px;">Continue to Pick Up Form &#8594;</button>';
+  html+='<button type="button" class="bk-back" id="guideBackBtn">&#8592; Back</button>';
   html+='<div style="height:30px"></div>';
 
   g.innerHTML=html;
   document.getElementById('guideContinueBtn').addEventListener('click',proceedToForm);
+  document.getElementById('guideBackBtn').addEventListener('click',backToHome);
 }
 
 function mkGSectionLabel(label){
@@ -334,8 +524,13 @@ function buildForm(){
   f.innerHTML+='<div class="sl">Liability &amp; Rental Agreement</div>';
   f.innerHTML+=mkLiability();
   f.innerHTML+='<button type="submit" class="subbtn">Submit Form \u2192</button>';
+  f.innerHTML+='<button type="button" class="bk-back" id="formBackBtn">&#8592; Back</button>';
   f.innerHTML+='<p class="subnote">Your name, email, and photos are recorded as documentation of the vessel condition.</p>';
   f.innerHTML+='<div style="height:48px"></div>';
+  document.getElementById('formBackBtn').addEventListener('click',function(){
+    if(pu) { document.getElementById('formWrap').style.display='none'; document.getElementById('guideScreen').style.display='block'; document.getElementById('hTitle').textContent=(boat==='monark'?'Monark':'Tracker')+' \u2014 Boat Guide'; document.getElementById('hSub').textContent='Read through before you head out on the water.'; document.getElementById('pLabel').style.visibility='hidden'; window.scrollTo({top:0,behavior:'smooth'}); }
+    else { backToHome(); }
+  });
   document.getElementById('fullName').addEventListener('input',upProg);
   document.getElementById('email').addEventListener('input',upProg);
   document.getElementById('rentalDate').addEventListener('input',upProg);
@@ -581,17 +776,347 @@ document.getElementById('retryBtn').addEventListener('click', function(){
   showScreen('formWrap');
 });
 
+// ══════════════════════════════════════════════════════════════
+// BOOKING FLOW JAVASCRIPT
+// ══════════════════════════════════════════════════════════════
+
+var bookBoat = null;
+var bookPickupDate = null;   // 'YYYY-MM-DD'
+var bookPickupHour = null;   // 0-23
+var bookDropoffDate = null;
+var bookDropoffHour = null;
+var bookBusy = [];           // [{start, end}] from Google Calendar
+var bookDlFiles = [];
+var bookBlFiles = [];
+
+// Calendar nav state
+var bkCy1 = new Date().getFullYear(), bkCm1 = new Date().getMonth();
+var bkCy2 = new Date().getFullYear(), bkCm2 = new Date().getMonth();
+
+var BK_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var BK_DOWS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+// ── Start / Cancel ────────────────────────────────────────────
+function startBooking() {
+  document.getElementById('selScreen').style.display = 'none';
+  document.getElementById('bkSection').style.display = 'block';
+  document.getElementById('pBar').style.width = '0%';
+  document.getElementById('pLabel').style.visibility = 'visible';
+  document.getElementById('pLabel').textContent = 'Step 1 of 4';
+  document.getElementById('hTitle').textContent = 'Book a Boat';
+  document.getElementById('hSub').textContent = 'Choose your pick up date and time to get started.';
+  document.getElementById('guideLink').style.display = 'none';
+  // Reset state
+  bookBoat = boat; bookPickupDate = null; bookPickupHour = null;
+  bookDropoffDate = null; bookDropoffHour = null; bookBusy = [];
+  bookDlFiles.length = 0; bookBlFiles.length = 0;
+  bkCy1 = new Date().getFullYear(); bkCm1 = new Date().getMonth();
+  bkCy2 = new Date().getFullYear(); bkCm2 = new Date().getMonth();
+  ['bkStep1Next','bkStep2Next'].forEach(function(id){ document.getElementById(id).classList.remove('rdy'); });
+  document.getElementById('bkPuBox').style.display='none';
+  document.getElementById('bkDoBox').style.display='none';
+  document.getElementById('bkTimeSection1').style.display='none';
+  document.getElementById('bkTimeSection2').style.display='none';
+  showBkStep(1);
+}
+
+function cancelBooking() {
+  document.getElementById('bkSection').style.display = 'none';
+  document.getElementById('selScreen').style.display = 'block';
+  document.getElementById('pBar').style.width = '0%';
+  document.getElementById('pLabel').style.visibility = 'hidden';
+  document.getElementById('hTitle').textContent = 'Monark Boat Rentals';
+  document.getElementById('hSub').textContent = 'Select your boat to get started.';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Step nav ──────────────────────────────────────────────────
+function showBkStep(n) {
+  document.querySelectorAll('.bk-step').forEach(function(el){ el.style.display = 'none'; });
+  document.getElementById('bkStep' + n).style.display = 'block';
+  var pct = Math.round((n - 1) / 3 * 100);
+  document.getElementById('pBar').style.width = pct + '%';
+  document.getElementById('pLabel').textContent = 'Step ' + n + ' of 4';
+  var titles = ['','Pick Up Date & Time','Drop-off Date & Time','Your Details','Review & Submit'];
+  document.getElementById('hTitle').textContent = titles[n] || 'Book a Boat';
+  if (n === 1) { fetchBkBusy(); renderBkCal(1); }
+  if (n === 2) { renderBkCal(2); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Availability from Google Calendar ─────────────────────────
+async function fetchBkBusy() {
+  try {
+    var boat = bookBoat || '';
+    if (!boat) return;
+    // Fetch current month + next 2 months to cover the 90-day calendar window
+    var now = new Date();
+    var fetches = [];
+    for (var i = 0; i < 3; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      var url = SUPABASE_URL + '/functions/v1/get-availability'
+        + '?boat=' + boat
+        + '&year=' + d.getFullYear()
+        + '&month=' + (d.getMonth() + 1);
+      fetches.push(fetch(url, { headers: { Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }));
+    }
+    var results = await Promise.all(fetches);
+    var allBusy = [];
+    for (var r of results) {
+      if (r.ok) { var data = await r.json(); allBusy = allBusy.concat(data.busy || []); }
+    }
+    bookBusy = allBusy;
+    renderBkCal(1); renderBkCal(2);
+  } catch(e) { console.log('Availability fetch:', e.message); }
+}
+
+var BK_BUFFER_HOURS = 2; // minimum gap required between a dropoff and the next pickup
+
+function isBkHourBusy(dateStr, h) {
+  var s = new Date(dateStr + 'T' + pad2(h) + ':00:00');
+  var e = new Date(dateStr + 'T' + pad2(h+1 < 24 ? h+1 : 23) + ':59:59');
+  return bookBusy.some(function(p){
+    var ps = new Date(new Date(p.start).getTime() - BK_BUFFER_HOURS*3600000);
+    var pe = new Date(new Date(p.end).getTime() + BK_BUFFER_HOURS*3600000);
+    return ps < e && pe > s;
+  });
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+// 'free' = no hours booked, 'partial' = some hours booked, 'full' = every hour booked
+function bkDayStatus(dateStr) {
+  var anyBusy=false, allBusy=true;
+  for (var h=0; h<24; h++) {
+    if (isBkHourBusy(dateStr, h)) anyBusy=true; else allBusy=false;
+  }
+  if (!anyBusy) return 'free';
+  return allBusy ? 'full' : 'partial';
+}
+
+// ── Calendar render ────────────────────────────────────────────
+function renderBkCal(which) {
+  var cy = which===1 ? bkCy1 : bkCy2;
+  var cm = which===1 ? bkCm1 : bkCm2;
+  var selDate = which===1 ? bookPickupDate : bookDropoffDate;
+  document.getElementById('bkCalLabel' + which).textContent = BK_MONTHS[cm] + ' ' + cy;
+  var grid = document.getElementById('bkCalGrid' + which);
+  grid.innerHTML = '';
+
+  BK_DOWS.forEach(function(d){ var el=document.createElement('div'); el.className='bk-cal-dow'; el.textContent=d; grid.appendChild(el); });
+
+  var today = new Date();
+  var todayStr = today.getFullYear()+'-'+pad2(today.getMonth()+1)+'-'+pad2(today.getDate());
+  var minDateStr = (which===2 && bookPickupDate) ? bookPickupDate : todayStr;
+  var firstDow = new Date(cy, cm, 1).getDay();
+  var numDays = new Date(cy, cm+1, 0).getDate();
+
+  for (var i=0; i<firstDow; i++) { var el=document.createElement('div'); el.className='bk-cal-day empty'; grid.appendChild(el); }
+  for (var d=1; d<=numDays; d++) {
+    var dateStr = cy+'-'+pad2(cm+1)+'-'+pad2(d);
+    var isPast = dateStr < minDateStr;
+    var status = isPast ? null : bkDayStatus(dateStr);
+    var isSel  = dateStr === selDate;
+    var el = document.createElement('div');
+    el.className = 'bk-cal-day' + (isPast?' past':'') + (status==='full'&&!isSel?' full':'') + (status==='partial'&&!isSel?' partial':'') + (isSel?' selected':'') + (dateStr===todayStr?' today':'');
+    el.textContent = d;
+    if (!isPast) { (function(ds){ el.onclick=function(){ pickBkDate(which,ds); }; })(dateStr); }
+    grid.appendChild(el);
+  }
+}
+
+function changeMonthBk(which, dir) {
+  if (which===1){ bkCm1+=dir; if(bkCm1>11){bkCm1=0;bkCy1++;} if(bkCm1<0){bkCm1=11;bkCy1--;} renderBkCal(1); }
+  else          { bkCm2+=dir; if(bkCm2>11){bkCm2=0;bkCy2++;} if(bkCm2<0){bkCm2=11;bkCy2--;} renderBkCal(2); }
+}
+
+function pickBkDate(which, dateStr) {
+  if (which===1) {
+    bookPickupDate=dateStr; bookPickupHour=null;
+    document.getElementById('bkStep1Next').classList.remove('rdy');
+    document.getElementById('bkPuBox').style.display='none';
+    renderBkCal(1);
+    var lbl = new Date(dateStr+'T12:00:00').toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+    document.getElementById('bkPuDateLabel').textContent = lbl;
+    document.getElementById('bkTimeSection1').style.display='block';
+    renderBkTimeGrid('bkTimeGrid1', dateStr, function(h){
+      bookPickupHour=h; updateBkPuDisplay();
+      document.getElementById('bkStep1Next').classList.add('rdy');
+    });
+    setTimeout(function(){ document.getElementById('bkTimeSection1').scrollIntoView({behavior:'smooth',block:'nearest'}); },100);
+  } else {
+    bookDropoffDate=dateStr; bookDropoffHour=null;
+    document.getElementById('bkStep2Next').classList.remove('rdy');
+    document.getElementById('bkDoBox').style.display='none';
+    renderBkCal(2);
+    var lbl = new Date(dateStr+'T12:00:00').toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+    document.getElementById('bkDoDateLabel').textContent = lbl;
+    document.getElementById('bkTimeSection2').style.display='block';
+    renderBkTimeGrid('bkTimeGrid2', dateStr, function(h){
+      bookDropoffHour=h; updateBkDoDisplay(); validateBkDates();
+    });
+    setTimeout(function(){ document.getElementById('bkTimeSection2').scrollIntoView({behavior:'smooth',block:'nearest'}); },100);
+  }
+}
+
+function renderBkTimeGrid(gridId, dateStr, onPick) {
+  var grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  for (var h=0; h<24; h++) {
+    var busy = isBkHourBusy(dateStr, h);
+    var el = document.createElement('div');
+    el.className = 'bk-time-slot' + (busy?' busy':'');
+    el.textContent = bkFmtH(h);
+    if (!busy) { (function(hour, slotEl){ slotEl.onclick=function(){ grid.querySelectorAll('.bk-time-slot').forEach(function(s){s.classList.remove('selected');}); slotEl.classList.add('selected'); onPick(hour); }; })(h, el); }
+    grid.appendChild(el);
+  }
+}
+
+function bkFmtH(h){ if(h===0)return'12 AM'; if(h<12)return h+' AM'; if(h===12)return'12 PM'; return(h-12)+' PM'; }
+function bkFmtDate(dateStr){ return new Date(dateStr+'T12:00:00').toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }
+function bkDT(dateStr,h){ return new Date(dateStr+'T'+pad2(h)+':00:00'); }
+
+function updateBkPuDisplay(){
+  if(!bookPickupDate||bookPickupHour===null) return;
+  document.getElementById('bkPuDisplay').textContent = bkFmtDate(bookPickupDate) + ' at ' + bkFmtH(bookPickupHour);
+  document.getElementById('bkPuBox').style.display = 'block';
+}
+function updateBkDoDisplay(){
+  if(!bookDropoffDate||bookDropoffHour===null) return;
+  document.getElementById('bkDoDisplay').textContent = bkFmtDate(bookDropoffDate) + ' at ' + bkFmtH(bookDropoffHour);
+  document.getElementById('bkDoBox').style.display = 'block';
+}
+function validateBkDates(){
+  var pu=bkDT(bookPickupDate,bookPickupHour), dof=bkDT(bookDropoffDate,bookDropoffHour);
+  var valid=dof>pu;
+  document.getElementById('bkDateErr').style.display = valid?'none':'block';
+  if(valid) document.getElementById('bkStep2Next').classList.add('rdy');
+  else      document.getElementById('bkStep2Next').classList.remove('rdy');
+}
+
+// ── File uploads ──────────────────────────────────────────────
+function setupBkZone(inputId, zoneId, prevId, arr) {
+  var input = document.getElementById(inputId);
+  var zone  = document.getElementById(zoneId);
+  input.addEventListener('change', function(){ arr.length=0; Array.from(input.files).forEach(function(f){arr.push(f);}); renderBkPrev(prevId,arr); });
+  zone.addEventListener('dragover',  function(e){ e.preventDefault(); zone.classList.add('ov'); });
+  zone.addEventListener('dragleave', function(){ zone.classList.remove('ov'); });
+  zone.addEventListener('drop', function(e){ e.preventDefault(); zone.classList.remove('ov'); arr.length=0; Array.from(e.dataTransfer.files).forEach(function(f){arr.push(f);}); renderBkPrev(prevId,arr); });
+}
+function renderBkPrev(prevId, files) {
+  var c = document.getElementById(prevId); c.innerHTML='';
+  files.forEach(function(f){
+    var div=document.createElement('div'); div.className='thumb';
+    if(f.type.startsWith('image/')){ var img=document.createElement('img'); img.src=URL.createObjectURL(f); div.appendChild(img); }
+    else { div.style.cssText='display:flex;align-items:center;justify-content:center;font-size:20px'; div.textContent='📄'; }
+    c.appendChild(div);
+  });
+}
+setupBkZone('bkDlInput','bkDlZone','bkDlPrev',bookDlFiles);
+setupBkZone('bkBlInput','bkBlZone','bkBlPrev',bookBlFiles);
+
+// ── Review ─────────────────────────────────────────────────────
+function goToBkReview() {
+  var name  = document.getElementById('bkName').value.trim();
+  var email = document.getElementById('bkEmail').value.trim();
+  var phone = document.getElementById('bkPhone').value.trim();
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  document.getElementById('bkNameErr').style.display  = name?'none':'block';
+  document.getElementById('bkEmailErr').style.display = emailOk?'none':'block';
+  document.getElementById('bkPhoneErr').style.display = phone?'none':'block';
+  document.getElementById('bkDlErr').style.display    = bookDlFiles.length?'none':'block';
+  document.getElementById('bkBlErr').style.display    = bookBlFiles.length?'none':'block';
+  if (!name||!emailOk||!phone||!bookDlFiles.length||!bookBlFiles.length) return;
+
+  var puDT  = bkDT(bookPickupDate,  bookPickupHour);
+  var doDT  = bkDT(bookDropoffDate, bookDropoffHour);
+  var opts  = {weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'};
+  var diffHrs = Math.round((doDT-puDT)/3600000);
+  var days=Math.floor(diffHrs/24), hrs=diffHrs%24;
+  var dur=(days?days+'d ':'')+( hrs?hrs+'h':'')||'<1h';
+
+  document.getElementById('rvBkBoat').textContent    = bookBoat==='monark'?'Monark (Fishing Boat)':'Tracker (Bass Boat)';
+  document.getElementById('rvBkPickup').textContent  = puDT.toLocaleString('en-CA',opts);
+  document.getElementById('rvBkDropoff').textContent = doDT.toLocaleString('en-CA',opts);
+  document.getElementById('rvBkDuration').textContent= dur.trim();
+  document.getElementById('rvBkName').textContent    = name;
+  document.getElementById('rvBkEmail').textContent   = email;
+  document.getElementById('rvBkPhone').textContent   = phone;
+  showBkStep(4);
+}
+
+// ── Submit booking ─────────────────────────────────────────────
+async function submitBkBooking() {
+  document.getElementById('bkSection').style.display='none';
+  showScreen('loadingScreen');
+  document.getElementById('loadingMsg').textContent = 'Uploading your documents...';
+  try {
+    var bookingId = Date.now().toString(36) + Math.random().toString(36).substring(2,8);
+
+    async function uploadBkFile(file, path) {
+      var res = await sb.storage.from('booking-docs').upload(path, file, {cacheControl:'3600',upsert:false});
+      if (res.error) throw new Error('Upload failed: ' + res.error.message);
+      return sb.storage.from('booking-docs').getPublicUrl(path).data.publicUrl;
+    }
+
+    var licUrls = {};
+    if (bookDlFiles.length) { var f=bookDlFiles[0]; licUrls.driver_license = await uploadBkFile(f, bookingId+'/dl.'+(f.name.split('.').pop()||'jpg')); }
+    if (bookBlFiles.length) { var f=bookBlFiles[0]; licUrls.boating_license= await uploadBkFile(f, bookingId+'/bl.'+(f.name.split('.').pop()||'jpg')); }
+
+    document.getElementById('loadingMsg').textContent = 'Submitting your booking request...';
+    var payload = {
+      id: bookingId, boat: bookBoat,
+      renter_name:     document.getElementById('bkName').value.trim(),
+      renter_email:    document.getElementById('bkEmail').value.trim(),
+      renter_phone:    document.getElementById('bkPhone').value.trim(),
+      pickup_datetime:  bookPickupDate  +'T'+pad2(bookPickupHour) +':00:00',
+      dropoff_datetime: bookDropoffDate +'T'+pad2(bookDropoffHour)+':00:00',
+      license_urls: licUrls,
+      notes: document.getElementById('bkNotes').value.trim()||null
+    };
+    var res = await fetch(SUPABASE_URL+'/functions/v1/submit-booking',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok){ var t=await res.text(); throw new Error(t); }
+
+    document.getElementById('okMsg').textContent = 'Your booking request for the '+(bookBoat==='monark'?'Monark':'Tracker')+' has been submitted. We\'ll review it and email '+document.getElementById('bkEmail').value.trim()+' shortly.';
+    showScreen('okScreen');
+  } catch(e) {
+    console.error(e);
+    document.getElementById('bkSection').style.display='block';
+    document.getElementById('errorMsg').textContent = 'Something went wrong: '+e.message+'. Please try again.';
+    showScreen('errorScreen');
+    document.getElementById('bkSection').style.display='block'; // keep visible behind error
+  }
+}
+// END BOOKING FLOW
+
+function backToHome(){
+  document.getElementById('guideScreen').style.display='none';
+  document.getElementById('formWrap').style.display='none';
+  document.getElementById('bkSection').style.display='none';
+  document.getElementById('selScreen').style.display='block';
+  document.getElementById('pBar').style.width='0%';
+  document.getElementById('pLabel').style.visibility='hidden';
+  document.getElementById('hTitle').textContent='Monark Boat Rentals';
+  document.getElementById('hSub').textContent='Select your boat to get started.';
+  document.getElementById('guideLink').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function resetApp(){
   boat=null;ftype=null;store={};
-  ['sbM','sbT','sbP','sbD'].forEach(function(id){document.getElementById(id).classList.remove('on');});
-  document.getElementById('goBtn').classList.remove('rdy');
+  ['sbM','sbT'].forEach(function(id){document.getElementById(id).classList.remove('on');});
+  ['optBook','optPickup','optDropoff'].forEach(function(id){document.getElementById(id).classList.remove('enabled');});
   document.getElementById('okScreen').classList.remove('on');
   document.getElementById('errorScreen').classList.remove('on');
   document.getElementById('formWrap').style.display='none';
   document.getElementById('guideScreen').style.display='none';
   document.getElementById('selScreen').style.display='block';
-  document.getElementById('hTitle').textContent='Rental Documentation';
-  document.getElementById('hSub').textContent='Select your boat and form type to get started.';
+  document.getElementById('bkSection').style.display='none';
+  document.getElementById('hTitle').textContent='Monark Boat Rentals';
+  document.getElementById('hSub').textContent='Select your boat to get started.';
   document.getElementById('pBar').style.width='0%';
   document.getElementById('pLabel').style.visibility='hidden';
   document.getElementById('guideLink').style.display='none';
