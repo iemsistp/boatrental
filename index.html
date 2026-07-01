@@ -356,6 +356,71 @@ function pickBoatHome(val){
   ['optBook','optPickup','optDropoff'].forEach(function(id){
     document.getElementById(id).classList.add('enabled');
   });
+  // Pre-fetch availability now so calendar is ready when they open booking
+  prefetchBusy(val);
+}
+
+// Cache keyed by boat so switching boats re-fetches correctly
+var bkBusyCache = {};
+var bkBusyLoading = false;
+
+function prefetchBusy(boatVal) {
+  bkBusyCache[boatVal] = null; // mark as loading
+  bkBusyLoading = true;
+  var now = new Date();
+  var fetches = [];
+  for (var i = 0; i < 3; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    var url = SUPABASE_URL + '/functions/v1/get-availability'
+      + '?boat=' + boatVal
+      + '&year=' + d.getFullYear()
+      + '&month=' + (d.getMonth() + 1);
+    fetches.push(fetch(url, { headers: { Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }));
+  }
+  Promise.all(fetches).then(function(results) {
+    var allBusy = [];
+    var pending = results.length;
+    results.forEach(function(r) {
+      r.json().then(function(data) {
+        allBusy = allBusy.concat(data.busy || []);
+        pending--;
+        if (pending === 0) {
+          bkBusyCache[boatVal] = allBusy;
+          // If booking is already open for this boat, update and re-render
+          if (bookBoat === boatVal) {
+            bookBusy = allBusy;
+            bkBusyLoading = false;
+            hideBkCalLoading();
+            renderBkCal(1); renderBkCal(2);
+          }
+        }
+      }).catch(function(){ pending--; if(pending===0){ bkBusyLoading=false; hideBkCalLoading(); } });
+    });
+  }).catch(function(){ bkBusyLoading=false; hideBkCalLoading(); });
+}
+
+function showBkCalLoading() {
+  ['bkCalGrid1','bkCalGrid2'].forEach(function(id){
+    var g = document.getElementById(id);
+    if (g) {
+      var existing = document.getElementById(id + '_loading');
+      if (existing) return;
+      var ov = document.createElement('div');
+      ov.id = id + '_loading';
+      ov.style.cssText = 'position:absolute;inset:0;background:rgba(245,242,236,.75);display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:\'DM Mono\',monospace;font-size:12px;color:#1a4c3b;letter-spacing:.05em;';
+      ov.textContent = 'Checking availability…';
+      var parent = g.parentElement;
+      if (parent.style.position !== 'absolute') parent.style.position = 'relative';
+      parent.appendChild(ov);
+    }
+  });
+}
+
+function hideBkCalLoading() {
+  ['bkCalGrid1_loading','bkCalGrid2_loading'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  });
 }
 
 function chooseIntent(kind){
@@ -808,7 +873,7 @@ function startBooking() {
   document.getElementById('guideLink').style.display = 'none';
   // Reset state
   bookBoat = boat; bookPickupDate = null; bookPickupHour = null;
-  bookDropoffDate = null; bookDropoffHour = null; bookBusy = [];
+  bookDropoffDate = null; bookDropoffHour = null;
   bookDlFiles.length = 0; bookBlFiles.length = 0;
   bkCy1 = new Date().getFullYear(); bkCm1 = new Date().getMonth();
   bkCy2 = new Date().getFullYear(); bkCm2 = new Date().getMonth();
@@ -817,6 +882,14 @@ function startBooking() {
   document.getElementById('bkDoBox').style.display='none';
   document.getElementById('bkTimeSection1').style.display='none';
   document.getElementById('bkTimeSection2').style.display='none';
+  // Use cached availability if ready, otherwise fetch now
+  if (bkBusyCache[boat] !== null && bkBusyCache[boat] !== undefined) {
+    bookBusy = bkBusyCache[boat];
+    bkBusyLoading = false;
+  } else {
+    bookBusy = [];
+    bkBusyLoading = true;
+  }
   showBkStep(1);
 }
 
@@ -846,28 +919,15 @@ function showBkStep(n) {
 
 // ── Availability from Google Calendar ─────────────────────────
 async function fetchBkBusy() {
-  try {
-    var boat = bookBoat || '';
-    if (!boat) return;
-    // Fetch current month + next 2 months to cover the 90-day calendar window
-    var now = new Date();
-    var fetches = [];
-    for (var i = 0; i < 3; i++) {
-      var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-      var url = SUPABASE_URL + '/functions/v1/get-availability'
-        + '?boat=' + boat
-        + '&year=' + d.getFullYear()
-        + '&month=' + (d.getMonth() + 1);
-      fetches.push(fetch(url, { headers: { Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }));
-    }
-    var results = await Promise.all(fetches);
-    var allBusy = [];
-    for (var r of results) {
-      if (r.ok) { var data = await r.json(); allBusy = allBusy.concat(data.busy || []); }
-    }
-    bookBusy = allBusy;
-    renderBkCal(1); renderBkCal(2);
-  } catch(e) { console.log('Availability fetch:', e.message); }
+  // If pre-fetch already completed, nothing to do
+  if (!bkBusyLoading) return;
+  // Show loading overlay to block premature clicks
+  showBkCalLoading();
+  // prefetchBusy is already in-flight from pickBoatHome; it will call hideBkCalLoading when done.
+  // If somehow we get here without a pre-fetch in progress, kick one off now.
+  if (bkBusyCache[bookBoat] === undefined) {
+    prefetchBusy(bookBoat);
+  }
 }
 
 var BK_BUFFER_HOURS = 2; // minimum gap required between a dropoff and the next pickup
@@ -919,7 +979,7 @@ function renderBkCal(which) {
     var el = document.createElement('div');
     el.className = 'bk-cal-day' + (isPast?' past':'') + (status==='full'&&!isSel?' full':'') + (status==='partial'&&!isSel?' partial':'') + (isSel?' selected':'') + (dateStr===todayStr?' today':'');
     el.textContent = d;
-    if (!isPast) { (function(ds){ el.onclick=function(){ pickBkDate(which,ds); }; })(dateStr); }
+    if (!isPast) { (function(ds){ el.onclick=function(){ if(bkBusyLoading){ return; } pickBkDate(which,ds); }; })(dateStr); }
     grid.appendChild(el);
   }
 }
